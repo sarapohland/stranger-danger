@@ -1,0 +1,40 @@
+from setuptools import setup
+
+setup(
+    name='kayak',
+    version='0.0.1',
+    packages=[
+        'control',
+        'control.configs',
+        'control.policy',
+        'control.utils',
+        'simulation',
+        'simulation.envs.policy',
+        'simulation.envs.utils',
+        'uncertainty',
+        'uncertainty.configs',
+        'hardware',
+        'hardware.utils',
+    ],
+    install_requires=[
+        'gitpython',
+        'gym==0.20.0',
+        'matplotlib==3.3.4',
+        'numpy==1.19.5',
+        'pandas==1.1.5',
+        'setuptools==58.0.4',
+        'torch==1.10.1',
+        'sklearn==0.0',
+        'torchvision==0.11.2',
+        'scipy==1.5.4',
+        'shapely==1.7.1',
+        'tqdm==4.64.0',
+        'Pillow==8.4.0'
+    ],
+    extras_require={
+        'test': [
+            'pylint',
+            'pytest',
+        ],
+    },
+)
