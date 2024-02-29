@@ -380,9 +380,14 @@ class CrowdSim(gym.Env):
         return ob, reward, done, info
 
     def render(self, mode='human', output_file=None):
+        import os
         from matplotlib import animation
         import matplotlib.pyplot as plt
         plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
+
+        # Make our save directory if needed.
+        if output_file is not None:
+            os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
         x_offset = 0.11
         y_offset = 0.11
