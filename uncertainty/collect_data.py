@@ -12,6 +12,8 @@ import pandas as pd
 from control.policy.policy_factory import policy_factory
 from simulation.envs.utils.robot import Robot
 
+from tqdm import tqdm
+
 
 def run_k_episodes(env, robot, k, offset, param):
     # Instantiate dicts to store our simulation data in.
@@ -38,7 +40,7 @@ def run_k_episodes(env, robot, k, offset, param):
                        "num_humans":[],
                        "room_size":[]}
 
-    for i in range(k):
+    for i in tqdm(range(k)):
         done = False
         np.random.seed(i)
         ob = env.reset('test')
@@ -212,8 +214,9 @@ def main():
     scenarios  = ['circle', 'perpedendicular', 'opposite', 'same', 'random', 'random']
     perpetuals = [False, False, False, False, False, True]
     positions_frames, agents_frames, scenarios_frames = [], [], []
-    for scenario, perpetual in zip(scenarios, perpetuals):
-        print("Running {} trials of {} scenario with perpetual = {}".format(trials, scenario, perpetual))
+    print("Starting data collection for {} different pedestrian scenarios..".format(len(scenarios)))
+    for cur_ind, (scenario, perpetual) in enumerate(zip(scenarios, perpetuals)):
+        print("({} of {}) Running {} trials of '{}' scenario with perpetual = {}.".format(cur_ind+1, len(scenarios), trials, scenario, perpetual))
         env.scenario, env.perpetual = scenario, perpetual
         positions_frame, agents_frame, scenarios_frame = run_k_episodes(env, robot, trials, offset, args.vary_param)
         positions_frames += [positions_frame]
@@ -228,6 +231,8 @@ def main():
     positions_df.to_csv(positions_file, index=False)
     agents_df.to_csv(agents_file, index=False)
     scenarios_df.to_csv(scenarios_file, index=False)
+
+    print("Saved results in {}, {}, and {}.".format(positions_file, agents_file, scenarios_file))
 
 
 if __name__ == '__main__':

@@ -50,7 +50,7 @@ From the `control` folder, run the following commands to train a socially-aware 
 python train.py --policy uncertain_sarl --output_dir model/
 ```
 
-This will save a trained uncertainty-aware RL policy in a folder called `model` in the `control` folder. The model will be trained using the parameters specified in the configuration files `env.config`, `policy.config`, and `train.config` within the `configs` folder. More information on the parameters in these configuration files can be found [here](https://github.com/sarapohland/stranger-danger/blob/main/control/configs/README.md).
+This will save a trained uncertainty-aware RL policy in a folder called `model` in the `control` folder. The model will be trained using the parameters specified in the configuration files `env.config`, `policy.config`, and `train.config` within the `configs` folder. More information on the parameters in these configuration files can be found [here](https://github.com/sarapohland/stranger-danger/blob/main/control/configs/README.md). *Note: It may take several hours or days to train a single model.*
 
 ### 2.2) Plot Policy Performance
 

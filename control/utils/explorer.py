@@ -98,6 +98,16 @@ class Explorer(object):
                       'intruded_vel_mean':[],'intruded_vel_std':[],'intruded_acc_mean':[],
                       'intruded_acc_std':[],'intruded_jerk_mean':[],'intruded_jerk_std':[]}
 
+        # Some printouts to help explain the following tqdm loading bar
+        if imitation_learning:
+            print("Generating data with ORCA for imitation learning ({} episodes with a maximum pedestrian randomness of {}).".format(k, max_epsilon))
+        elif phase == 'train':
+            print("Generating data for training ({} episodes with a maximum pedestrian randomness of {}).".format(k, max_epsilon))
+        elif phase == 'val':
+            print("Validating on {} episodes with a maximum pedestrian randomness of {}.".format(k, max_epsilon))
+        elif phase == 'test':
+            print("Testing on {} episodes with a maximum pedestrian randomness of {}.".format(k, max_epsilon))
+
         from tqdm import tqdm
         for trial in tqdm(range(k)):
             ob = self.env.reset(phase, max_epsilon=max_epsilon)

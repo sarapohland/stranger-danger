@@ -24,6 +24,7 @@ def main():
         for aKey in dfBoi:
             dfBoi[aKey] = dfBoi[aKey].apply(lambda x: ast.literal_eval(str(x)) if str(x)[0] in brackets else x)
 
+    print("Extracting lists, tuples, and dicts from {} dataframes..".format(len(df_list)))
     for aDF in tqdm(df_list):
         convert_columns(aDF)
 
@@ -45,6 +46,7 @@ def main():
     results_dir = "{}/preprocessed_data".format(data_dir)
 
     # Iterate through all the trials and generate data for each human
+    print("Calculating robot and human statistics across {} trials..".format(scenarios_df['trial'].nunique()))
     trial_list = scenarios_df['trial'].unique()
     for a_trial in tqdm(trial_list):
         # Make a folder to store the results for each trial in
@@ -128,6 +130,8 @@ def main():
 
             # Save our calculations to a file
             human_df.to_csv(human_file)
+
+    print("Saved results in {}.".format(results_dir))
 
 if __name__ == '__main__':
     main()

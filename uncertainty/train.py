@@ -44,6 +44,7 @@ def extract_data(data_dir, time_size, step_size, labels, num_neighbors, density_
     scenarios_df = pd.read_csv("{}/scenarios.csv".format(data_dir))
     agents_df = pd.read_csv("{}/agents.csv".format(data_dir))
     df_list = [scenarios_df, agents_df]
+    print("Extracting lists, tuples, and dicts from {} dataframes..".format(len(df_list)))
     for aDF in tqdm(df_list):
         convert_columns(aDF)
 
@@ -56,6 +57,7 @@ def extract_data(data_dir, time_size, step_size, labels, num_neighbors, density_
     sample_size = block_size + num_neighbors + len(density_radii)
 
     # Iterate through all of our trials.
+    print("Generating training data from {} trials..".format(scenarios_df['trial'].nunique()))
     trial_list = scenarios_df['trial'].unique()
     for a_trial in tqdm(trial_list):
         # Grab the epsilon values for all the humans in this trial
@@ -284,7 +286,8 @@ def main():
     # Run training process over several epochs
     train_loss = []
     test_loss  = []
-    for t in range(epochs):
+    print("Training for {} epochs..".format(epochs))
+    for t in tqdm(range(epochs)):
         logging.info('Epoch %d -------------------------------', t+1)
         train_loss += [train(train_loader, model, criterion, optimizer, device)]
         test_loss  += [test(test_loader, model, criterion, device)]
@@ -300,6 +303,7 @@ def main():
 
     # Save trained model
     torch.save(model.state_dict(), model_file)
+    print("Saved model weights at {}.".format(model_file))
 
     # Evaluate and plot epsilon values
     plot_epsilons(test_loader, model, device, fig_file, args)

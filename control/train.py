@@ -13,6 +13,10 @@ from control.utils.memory import ReplayMemory
 from control.utils.explorer import Explorer
 from control.policy.policy_factory import policy_factory
 
+# This program throws a lot of RuntimeWarnings that can be ignored, so we suppress warnings.
+# If you are trying to troubleshoot, please comment out the `warnings.filterwarnings('ignore')`
+# line at the bottom of this file. Thanks!
+import warnings
 
 def main():
     parser = argparse.ArgumentParser('Parse configuration file')
@@ -150,6 +154,8 @@ def main():
     max_randomness = randomness_start
     randomness_episodes = (randomness_end - randomness_start) / randomness_step + 1
     randomness_interval = round(train_episodes / randomness_episodes)
+    print("\n\nStarting epsilon-greedy RL training with {} stages starting from epsilon = {} and going to epsilon = {}.".format(train_episodes, epsilon_start, epsilon_end))
+    print("Note: This includes curriculum training, with maximum pedestrian randomness starting at {} and going up to {}.\nMaximum pedestrian randomness increases by {} every {} RL training stages.".format(randomness_start, randomness_end, randomness_step, randomness_interval))
     while episode < train_episodes:
         if args.resume:
             epsilon = epsilon_end
@@ -159,6 +165,11 @@ def main():
             else:
                 epsilon = epsilon_end
         robot.policy.set_epsilon(epsilon)
+
+        print("\n========================================")
+        print("Stage {} of {}: epsilon-greedy = {}".format(episode + 1, train_episodes, epsilon))
+        print("========================================\n")
+
 
         # update the maximum randomness of humans
         if episode != 0 and episode % randomness_interval == 0:
@@ -184,4 +195,5 @@ def main():
 
 
 if __name__ == '__main__':
+    warnings.filterwarnings('ignore')
     main()
