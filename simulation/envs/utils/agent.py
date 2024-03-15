@@ -1,17 +1,25 @@
 import abc
+import random
 import logging
 import numpy as np
 import numpy.linalg as la
-from simulation.envs.policy.policy_factory import policy_factory
+from simulation.envs.policy.policy_factory import policy_names, policy_factory
 from simulation.envs.utils.action import ActionXY, ActionRot
 from simulation.envs.utils.state import ObservableState, FullState
 
 
 class Agent(object):
-    def __init__(self, config, section):
+    def __init__(self, config, section, seed=None):
+        if seed is not None:
+            random.seed(seed)
+
         # Policy
+        policy_name = config.get(section, 'policy')
+        if policy_name == 'random':
+            policy_name = random.choice(policy_names)
+
         self.visible = config.getboolean(section, 'visible')
-        self.policy = policy_factory[config.get(section, 'policy')]()
+        self.policy = policy_factory[policy_name]()
         self.sensor = config.get(section, 'sensor')
         self.observability = config.get(section, 'observability')
         self.range = config.getint(section, 'range')

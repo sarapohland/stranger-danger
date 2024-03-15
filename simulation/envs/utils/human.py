@@ -1,15 +1,26 @@
+import os
+import torch
+
 from numpy.linalg import norm
 from numpy.random import normal
 from simulation.envs.utils.agent import Agent
 from simulation.envs.policy.orca import ORCA
-from simulation.envs.utils.action import ActionXY
+from simulation.envs.utils.action import ActionXY, ActionRot
 from simulation.envs.utils.state import JointState, FullState
 
 
 class Human(Agent):
-    def __init__(self, config, section):
+    def __init__(self, config, section, seed=None):
         super().__init__(config, section)
         self.epsilon = 0.0
+
+        # Load model weights for CADRL model
+        if self.policy is not None and self.policy.name == 'CADRL':
+            model_dir = '../crowd_sim/envs/policy/cadrl/'
+            model_weights = os.path.join(model_dir, 'rl_model.pth')
+            self.policy.get_model().load_state_dict(torch.load(model_weights))
+            self.policy.phase = 'test'
+            self.policy.set_device(torch.device("cpu"))
 
     # A function to set how random we the human to be
     def set_epsilon(self, epsilon):
@@ -38,4 +49,7 @@ class Human(Agent):
         # We assume a fully-unpredictable person will have this distribution of potential actions
         noise = normal(scale=self.v_pref, size=2)
 
-        return ActionXY(self.epsilon*noise[0] + (1-self.epsilon)*action.vx, self.epsilon*noise[1] + (1-self.epsilon)*action.vy)
+        if isinstance(action, ActionXY):
+            return ActionXY(self.epsilon*noise[0] + (1-self.epsilon)*action.vx, self.epsilon*noise[1] + (1-self.epsilon)*action.vy)
+        else:
+            return action # NOTE: CANNOT ADD NOISE TO NON-HOLONOMIC ACTION

@@ -13,7 +13,6 @@ from simulation.envs.utils.scenarios import GenerateHumans
 from simulation.envs.utils.functions import point_to_segment_dist
 from uncertainty.estimate_epsilons import estimate_epsilons
 
-
 class CrowdSim(gym.Env):
     metadata = {'render.modes': ['human']}
 
@@ -93,7 +92,7 @@ class CrowdSim(gym.Env):
         gen = GenerateHumans(self.room_dims, self.discomfort_dist, self.goal_radius, seed)
 
         for i in range(human_num):
-            human = Human(self.config, 'humans')
+            human = Human(self.config, 'humans', seed)
             if scenario == 'circle':
                 human = gen.generate_circle_human(human, self.robot, self.humans)
             elif scenario == 'perpedendicular':
@@ -109,14 +108,21 @@ class CrowdSim(gym.Env):
 
             if human is not None:
                 human.set_epsilon(np.random.uniform(0, max_epsilon))
+                human.policy.set_env(self)
                 if self.randomize_radius:
                     human.radius = human.policy.radius = np.random.uniform(self.min_radius, self.max_radius)
                 if self.randomize_v_pref:
                     human.v_pref = human.policy.max_speed = np.random.uniform(self.min_v_pref, self.max_v_pref)
                 if self.randomize_neigh_dist:
-                    human.policy.neighbor_dist = np.random.uniform(self.min_neigh_dist, self.max_neigh_dist)
+                    try:
+                        human.policy.neighbor_dist = np.random.uniform(self.min_neigh_dist, self.max_neigh_dist)
+                    except:
+                        pass 
                 if self.randomize_horizon:
-                    human.policy.time_horizon = np.random.uniform(self.min_horizon, self.max_horizon)
+                    try:
+                        human.policy.time_horizon = np.random.uniform(self.min_horizon, self.max_horizon)
+                    except:
+                        pass
                 self.humans.append(human)
 
     def choose_random_goal(self, human, px, py):
@@ -272,7 +278,7 @@ class CrowdSim(gym.Env):
         self.human_times = [0] * len(self.humans)
         for agent in [self.robot] + self.humans:
             agent.time_step = self.time_step
-            agent.policy.time_step = self.time_step
+            agent.policy.set_time_step(self.time_step) 
         self.case_counter[phase] = (self.case_counter[phase] + 1) % self.case_size[phase]
 
         # Initialize visualization lists
@@ -378,25 +384,38 @@ class CrowdSim(gym.Env):
             ob = self.get_next_observation(self.robot, human_actions)
 
         return ob, reward, done, info
+    
+    def policy_colors(self, policy_name):
+        if policy_name == 'Linear':
+            return 'blue'
+        elif policy_name == 'ORCA':
+            return 'green'
+        else:
+            return 'red'
 
     def render(self, mode='human', output_file=None):
-        import os
         from matplotlib import animation
         import matplotlib.pyplot as plt
+        import matplotlib.colors as colors
+        import matplotlib.cm as cm
         plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
-
-        # Make our save directory if needed.
-        if output_file is not None:
-            os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
         x_offset = 0.11
         y_offset = 0.11
         cmap = plt.cm.get_cmap('hsv', 10)
-        robot_color = 'blue'
+        robot_color = 'black'
         human_color = 'green'
         goal_color = 'red'
         arrow_color = 'red'
         arrow_style = patches.ArrowStyle("->", head_length=4, head_width=2)
+
+        if not all(eps == 0.0 for eps in self.get_epsilons()):
+            norm = colors.Normalize(0.0, 0.5, clip=True)
+            mapper = cm.ScalarMappable(norm=norm, cmap='coolwarm')
+            human_colors = [mapper.to_rgba(eps) for eps in self.get_epsilons()]
+        else:
+            policy_names = [human.policy.name for human in self.humans]
+            human_colors = list(map(self.policy_colors, policy_names))
 
         if mode == 'human':
             fig, ax = plt.subplots(figsize=(7, 7))
@@ -469,7 +488,7 @@ class CrowdSim(gym.Env):
 
             # add humans and their numbers
             human_positions = [[state[1][j].position for j in range(len(self.humans))] for state in self.states]
-            humans = [plt.Circle(human_positions[0][i], self.humans[i].radius, fill=True, color=human_color)
+            humans = [plt.Circle(human_positions[0][i], self.humans[i].radius, fill=True, color=human_colors[i])
                       for i in range(len(self.humans))]
             human_numbers = [plt.text(humans[i].center[0] - x_offset, humans[i].center[1] - y_offset, str(i),
                                       color='black', fontsize=12) for i in range(len(self.humans))]
@@ -505,6 +524,10 @@ class CrowdSim(gym.Env):
             for arrow in arrows:
                 ax.add_artist(arrow)
             global_step = 0
+
+            # add color bar
+            if not all(eps == 0.0 for eps in self.get_epsilons()):
+                plt.colorbar(mapper)
 
             def update(frame_num):
                 nonlocal global_step

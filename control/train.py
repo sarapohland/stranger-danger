@@ -14,9 +14,9 @@ from control.utils.explorer import Explorer
 from control.policy.policy_factory import policy_factory
 
 # This program throws a lot of RuntimeWarnings that can be ignored, so we suppress warnings.
-# If you are trying to troubleshoot, please comment out the `warnings.filterwarnings('ignore')`
-# line at the bottom of this file. Thanks!
+# If you are trying to troubleshoot, please comment out these lines. Thanks!
 import warnings
+warnings.filterwarnings('ignore', category=RuntimeWarning)
 
 def main():
     parser = argparse.ArgumentParser('Parse configuration file')
@@ -195,5 +195,4 @@ def main():
 
 
 if __name__ == '__main__':
-    warnings.filterwarnings('ignore')
     main()

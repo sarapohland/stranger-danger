@@ -131,9 +131,17 @@ class Explorer(object):
             episode_collision_pos = []
             episode_collision_blames = []
 
+            new_eps = None
+            eps = None
+            exp_alpha = 0.8
+
             while not done:
                 perf_start = time.perf_counter()
-                eps = self.env.get_epsilons(estimate_eps)
+                new_eps = self.env.get_epsilons(estimate_eps)
+                if eps is None:
+                    eps = new_eps
+                else:
+                    eps = exp_alpha*eps + (1 - exp_alpha)*new_eps
                 action = self.robot.act(ob, eps)
                 perf_end = time.perf_counter()
                 perf_time.append(perf_end - perf_start)

@@ -88,6 +88,5 @@ def estimate_epsilons(all_positions, dt):
         else:
             X, y = get_Xy(positions, dt, time_size)
             model_dir = '../uncertainty/models/uncertain_{}'.format(time_size)
-            pred = np.mean(get_pred(X, y, model_dir))
-            eps_pred.append(pred)
+            eps_pred.append(get_pred(X, y, model_dir)[-1])
     return np.array(eps_pred)

@@ -20,7 +20,6 @@ venv*/
 *.csv
 *.pkl
 data/
-model/
 models/
 output/
 videos/

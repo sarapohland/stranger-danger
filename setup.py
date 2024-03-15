@@ -18,6 +18,7 @@ setup(
     ],
     install_requires=[
         'gitpython',
+        'tabulate',
         'gym==0.20.0',
         'matplotlib==3.3.4',
         'numpy==1.19.5',

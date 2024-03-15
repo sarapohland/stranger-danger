@@ -13,6 +13,12 @@ from simulation.envs.utils.robot import Robot
 from simulation.envs.policy.orca import ORCA
 from simulation.envs.utils.info import *
 
+# This program throws a lot of RuntimeWarnings that can be ignored, so we suppress warnings.
+# If you are trying to troubleshoot, please comment out these lines. Thanks!
+import warnings
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=RuntimeWarning)
+
 
 def main():
     parser = argparse.ArgumentParser('Parse configuration file')
@@ -39,9 +45,9 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() and args.gpu else "cpu")
     # logging.info('Using device: %s', device)
 
-    # read config files
+    # load model and read config files
+    env_config_file = args.env_config
     if args.model_dir is not None:
-        env_config_file = os.path.join(args.model_dir, os.path.basename(args.env_config))
         policy_config_file = os.path.join(args.model_dir, os.path.basename(args.policy_config))
         if args.il:
             model_weights = os.path.join(args.model_dir, 'il_model.pth')
@@ -51,7 +57,6 @@ def main():
             else:
                 model_weights = os.path.join(args.model_dir, 'rl_model.pth')
     else:
-        env_config_file = args.env_config
         policy_config_file = args.policy_config
 
     # configure policy
@@ -106,13 +111,11 @@ def main():
         else:
             env.render('video', args.video_file)
 
-        # logging.info('It takes %.2f seconds to finish. Final status is %s', env.global_time, info)
-        # if robot.visible and info == 'reach goal':
-        #     human_times = env.get_human_times()
-        #     logging.info('Average time for humans to reach goal: %.2f', sum(human_times) / len(human_times))
-
     # run evaluation without visualization
     else:
+        save_dir = os.path.dirname(args.stats_file)
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         explorer = Explorer(env, robot, device, gamma=0.9, stats_file=args.stats_file)
         k = int(args.num_episodes if args.num_episodes > 0 else env.case_size[args.phase])
         explorer.run_k_episodes(k, args.phase, print_failure=True, max_epsilon=args.max_epsilon, estimate_eps=args.estimate_eps)
