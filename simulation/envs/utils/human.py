@@ -16,7 +16,7 @@ class Human(Agent):
 
         # Load model weights for CADRL model
         if self.policy is not None and self.policy.name == 'CADRL':
-            model_dir = '../crowd_sim/envs/policy/cadrl/'
+            model_dir = '../simulation/envs/policy/cadrl/'
             model_weights = os.path.join(model_dir, 'rl_model.pth')
             self.policy.get_model().load_state_dict(torch.load(model_weights))
             self.policy.phase = 'test'
