@@ -1,6 +1,6 @@
 # Stranger Danger
 
-This is the codebase for the paper titled "Stranger Danger! Identifying and Avoiding Unpredictable Pedestrians in RL-based Social Robot Navigation," which was accepted to the 2024 IEEE International Conference on Robotics and Automation (ICRA) and will be presented in May. This README describes how to reproduce the results achieved in this paper. A video showcasing our methods and results is available on [YouTube](https://youtu.be/9IDhXvCC58w?si=Y0Di3d5NjWj-3nvl).
+This is the codebase for the paper titled ["Stranger Danger! Identifying and Avoiding Unpredictable Pedestrians in RL-based Social Robot Navigation,"](https://ieeexplore.ieee.org/document/10610413) which was presented at the 2024 IEEE International Conference on Robotics and Automation (ICRA). This README describes how to reproduce the results achieved in this paper. An extended version of our paper is available on [arXiv](https://arxiv.org/abs/2407.06056), and a video showcasing our methods and results is available on [YouTube](https://youtu.be/9IDhXvCC58w?si=Y0Di3d5NjWj-3nvl). If you find this work useful, please cite our paper using the citation provided at end of this [README](https://github.com/sarapohland/stranger-danger#citing-our-work).
 
 ## 0) Setup
 
@@ -239,3 +239,20 @@ python test.py --policy uncertain_sarl --model_dir models/reward/ --estimate_eps
 ```
 
 This will save a video called `test1.mp4` in the `videos/reward/` folder showing trial number 1 with the environment configurations specified by `config_file` and the maximum epsilon specified by `epsilon_value`.
+
+## Citing Our Work
+
+If you find this codebase useful, please cite the paper associated with this repository:
+
+S. Pohland, A. Tan, P. Dutta and C. Tomlin, "Stranger Danger! Identifying and Avoiding Unpredictable Pedestrians in RL-based Social Robot Navigation," 2024 IEEE International Conference on Robotics and Automation (ICRA), Yokohama, Japan, 2024, pp. 15217-15224, doi: 10.1109/ICRA57147.2024.10610413.
+
+@InProceedings{stranger-danger, \
+&emsp; author="Pohland, Sara and Tan, Alvin and Dutta, Prabal and Tomlin, Claire", \
+&emsp; title="Stranger Danger! Identifying and Avoiding Unpredictable Pedestrians in RL-based Social Robot Navigation", \
+&emsp; booktitle="2024 IEEE International Conference on Robotics and Automation (ICRA)", \
+&emsp; year="2024", \
+&emsp; month="May", \
+&emsp; publisher="IEEE", \
+&emsp; pages="15217--15224", \
+&emsp; doi="10.1109/ICRA57147.2024.10610413" \
+&emsp; }
